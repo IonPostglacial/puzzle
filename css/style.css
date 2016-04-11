@@ -155,7 +155,7 @@ fieldset .btn:last-child, .btn-group li:last-child .btn {
   left: calc(50% + var(--offset));
 }
 
-.popover ul {
+.popover ul, .popover table {
   display: table;
   list-style: none;
   margin: auto;
@@ -177,12 +177,20 @@ fieldset .btn:last-child, .btn-group li:last-child .btn {
   white-space: nowrap;
   text-decoration: none;
   color: black;
-  padding: var(--widget-padding) calc(var(--widget-padding) + 32px) var(--widget-padding) var(--widget-padding);
+  padding: var(--widget-padding) var(--widget-padding) var(--widget-padding) var(--widget-padding);
 }
 
-.popover li > .menu-entry:hover {
+.popover li > .menu-entry:hover, .popover td:hover {
   background-color: var(--accent-color);
   color: white;
+}
+
+.popover td {
+  padding: var(--widget-padding);
+  border-radius: var(--default-rounding);
+  background: var(--widget-color);
+  margin: var(--default-margin);
+  border: 1px var(--widget-border-color) solid;
 }
 
 table.gauge {
