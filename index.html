@@ -117,32 +117,30 @@
       </script>
   <body id="puzzle-game">
     <h1>Puzzle</h1>
-    <ul class="tool-box">
-      <li class="tool"><a id="load-image" class="btn">
+    <div class="tool-box">
+      <a id="load-image" class="btn">
         <i class="fa fa-pull-left fa-fw fa-file-image-o"></i>Charger un image
-      </a></li>
-      <li class="tool"><a id="shuffle" class="btn">
+      </a>
+      <a id="shuffle" class="btn">
         <i class="fa fa-pull-left fa-fw fa-cubes"></i>Mélanger
-      </a></li>
-      <li class="tool"><a id="restart" class="btn">
+      </a>
+      <a id="restart" class="btn">
         <i class="fa fa-pull-left fa-fw fa-undo"></i>Recommencer
-      </a></li>
-      <li class="tool">
-        <label class="popover btn">
-          <input type="checkbox" /><span><i class="fa fa-pull-right fa-caret-down"></i>Taille</span>
-          <div class="popover-panel" >
-            <table id="size-selector">
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            </table>
-          </div>
-        </label>
-      </li>
-    </ul>
+      </a>
+      <label class="popover btn">
+        <input type="checkbox" /><span><i class="fa fa-pull-right fa-caret-down"></i>Taille</span>
+        <div class="popover-panel" >
+          <table id="size-selector">
+            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </table>
+        </div>
+      </label>
+    </div>
     <canvas id="puzzle-img" class="centered checkboard" width="600" height="480"></canvas>
   </body>
 </html>
