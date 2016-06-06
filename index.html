@@ -10,7 +10,7 @@
         return {
           dimensions: [1, 1],
           pieces: [],
-          selectedPieceIndex: null,
+          selectedPiece: null,
           image: new Image(),
           initPieces (width, height) {
             const [hsize, vsize] = this.dimensions;
@@ -93,24 +93,30 @@
         $('#size-selector').onclick = e => {
           puzzle.setDimensions(e.target.cellIndex + 1, e.target.parentNode.rowIndex + 1);
           puzzle.draw(puzzleCtx);
-        }
+        };
         $('#puzzle-img').onmousedown = e => {
           const [hsize, vsize] = puzzle.dimensions;
-          const oldSelectedPieceIndex = puzzle.selectedPieceIndex;
+          const oldSelectedPiece = puzzle.selectedPiece;
           for (let [i, {current: [posH, posV]}] of puzzle.pieces.entries()) {
             const rect = [posH, posV, puzzle.image.width / hsize, puzzle.image.height / vsize];
             if (puzzle.inRect([e.offsetX, e.offsetY], rect)) {
-              puzzle.selectedPieceIndex = i;
+              puzzle.selectedPiece = puzzle.pieces[i];
+              puzzle.pieces[i] = puzzle.pieces[puzzle.pieces.length - 1];
+              puzzle.pieces[puzzle.pieces.length - 1] = puzzle.selectedPiece;
             }
           }
-          if (oldSelectedPieceIndex === puzzle.selectedPieceIndex) {
-            puzzle.selectedPieceIndex = null;
+          if (oldSelectedPiece === puzzle.selectedPiece) {
+            puzzle.selectedPiece = null;
           }
-        }
+          puzzle.draw(puzzleCtx);
+        };
+        $('#puzzle-img').onmouseup = e => {
+          puzzle.selectedPiece = null;
+        };
         $('#puzzle-img').onmousemove = e => {
           const [hsize, vsize] = puzzle.dimensions;
-          if (puzzle.selectedPieceIndex === null) { return; }
-          puzzle.pieces[puzzle.selectedPieceIndex].current = [e.offsetX - 0.5 * puzzle.image.width / hsize, e.offsetY - 0.5 * puzzle.image.height / vsize];
+          if (puzzle.selectedPiece === null) { return; }
+          puzzle.selectedPiece.current = [e.offsetX - 0.5 * puzzle.image.width / hsize, e.offsetY - 0.5 * puzzle.image.height / vsize];
           puzzle.draw(puzzleCtx);
         }
       }
@@ -119,7 +125,7 @@
     <h1>Puzzle</h1>
     <div class="tool-box">
       <a id="load-image" class="btn">
-        <i class="fa fa-pull-left fa-fw fa-file-image-o"></i>Charger un image
+        <i class="fa fa-pull-left fa-fw fa-file-image-o"></i>Charger une image
       </a>
       <a id="shuffle" class="btn">
         <i class="fa fa-pull-left fa-fw fa-cubes"></i>Mélanger
