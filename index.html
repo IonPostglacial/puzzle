@@ -93,12 +93,13 @@
          puzzle.setDimensions(e.target.cellIndex + 1, e.target.parentNode.rowIndex + 1);
          puzzle.draw(puzzleCtx);
        });
-       function handleMove (e) {
+       function handleMove (offsetX, offsetY) {
          const [hsize, vsize] = puzzle.dimensions;
          if (puzzle.selectedPiece === null) { return; }
-         puzzle.selectedPiece.current = [e.offsetX - 0.5 * puzzle.image.width / hsize, e.offsetY - 0.5 * puzzle.image.height / vsize];
+         puzzle.selectedPiece.current = [offsetX - 0.5 * puzzle.image.width / hsize, offsetY - 0.5 * puzzle.image.height / vsize];
          puzzle.draw(puzzleCtx);
        }
+        const mouseMove = e => handleMove(e.offsetX, e.offsetY);
        $('#puzzle-img').mousedown(function (e) {
          const [hsize, vsize] = puzzle.dimensions;
          const oldSelectedPiece = puzzle.selectedPiece;
@@ -114,11 +115,21 @@
            puzzle.selectedPiece = null;
          }
          puzzle.draw(puzzleCtx);
-         $('#puzzle-img').on('mousemove', handleMove);
+         $('#puzzle-img').on('mousemove', mouseMove);
        });
        $('#puzzle-img').mouseup(function (e) {
-         puzzle.selectedPiece = null;
-         $('#puzzle-img').off('mousemove', handleMove);
+         $('#puzzle-img').off('mousemove', mouseMove);
+       });
+       function handleTouchMove (e) {
+         e.preventDefault();
+         const event = e.originalEvent;
+         handleMove(event.touches[0].pageX, event.touches[0].pageY);
+       }
+       $('#puzzle-img').on('touchstart', function (e) {
+        $('#puzzle-img').on('touchmove', handleTouchMove);
+       });
+       $('#puzzle-img').on('touchend', function (e) {
+        $('#puzzle-img').off('touchmove', handleTouchMove);
        });
      });
     </script>
