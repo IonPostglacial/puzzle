@@ -1,152 +1,152 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <meta charset="utf-8" />
-      <title>Playing with hexagons</title>
-      <link href="css/font-awesome.min.css" rel="stylesheet">
-      <link href="css/style.css" rel="stylesheet">
-      <script>
-      const puzzle = (() => { "use strict";
-        return {
-          dimensions: [1, 1],
-          pieces: [],
-          selectedPiece: null,
-          image: new Image(),
-          initPieces (width, height) {
-            const [hsize, vsize] = this.dimensions;
-            const hunit = width / hsize | 0;
-            const vunit = height / vsize | 0;
-            this.pieces = new Array(hsize * vsize).fill(0).map((_, i) => {
-              const correctPosition = [hunit * (i % hsize), vunit * (i / hsize | 0)]; // oh yeah !
-              return {current: [width, height], goal: correctPosition};
-            });
-          },
-          setImage (img) {
-            this.image = img;
-            this.initPieces(img.width, img.height);
-          },
-          setDimensions (hnum, vnum) {
-            this.dimensions = [hnum, vnum];
-            this.initPieces(this.image.width, this.image.height);
-          },
-          shuffle (width, height) {
-            const [hsize, vsize] = this.dimensions;
-            const hmax = width - width / hsize | 0;
-            const vmax = height - height / vsize | 0;
-            for (let piece of this.pieces) {
-              piece.current = [hmax * Math.random() + width, vmax * Math.random()];
-            }
-          },
-          draw (ctx) {
-            const [hsize, vsize] = this.dimensions;
-            const img = this.image;
-            ctx.clearRect(0, 0, img.width * 2, img.height * 2);
-            ctx.globalAlpha = 0.8;
-            ctx.drawImage(img, 0, 0);
-            ctx.globalAlpha = 1;
-            ctx.beginPath();
-            ctx.strokeStyle = "#ddd";
-            for (let {goal: [h, v]} of this.pieces) {
-              ctx.rect(h, v, img.width / hsize, img.height / vsize);
-            }
-            ctx.stroke();
-            for (let {current: [h, v], goal: [correctH, correctV]} of this.pieces) {
-              ctx.drawImage(img, correctH, correctV, img.width / hsize, img.height / vsize,
-                h, v, img.width / hsize, img.height / vsize);
-            }
-          },
-          inRect ([posX, posY], [rectX, rectY, rectW, rectH]) {
-            return posX >= rectX && posX <= rectX + rectW && posY >= rectY && posY <= rectY + rectH;
-          }
-        }
-      })();
+    <meta charset="utf-8" />
+    <title>Playing with hexagons</title>
+    <link href="css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="lib/jquery-2.2.4.min.js"></script>
+    <script>
+     const puzzle = (function () { "use strict"; return {
+       dimensions: [1, 1],
+       pieces: [],
+       selectedPiece: null,
+       image: new Image(),
+       initPieces (width, height) {
+         const [hsize, vsize] = this.dimensions;
+         const hunit = width / hsize | 0;
+         const vunit = height / vsize | 0;
+         this.pieces = new Array(hsize * vsize).fill(0).map((_, i) => {
+           const correctPosition = [hunit * (i % hsize), vunit * (i / hsize | 0)]; // oh yeah !
+           return {current: [width, height], goal: correctPosition};
+         });
+       },
+       setImage (img) {
+         this.image = img;
+         this.initPieces(img.width, img.height);
+       },
+       setDimensions (hnum, vnum) {
+         this.dimensions = [hnum, vnum];
+         this.initPieces(this.image.width, this.image.height);
+       },
+       shuffle (width, height) {
+         const [hsize, vsize] = this.dimensions;
+         const hmax = width - width / hsize | 0;
+         const vmax = height - height / vsize | 0;
+         for (let piece of this.pieces) {
+           piece.current = [hmax * Math.random() + width, vmax * Math.random()];
+         }
+       },
+       draw (ctx) {
+         const [hsize, vsize] = this.dimensions;
+         const img = this.image;
+         ctx.clearRect(0, 0, img.width * 2, img.height * 2);
+         ctx.globalAlpha = 0.8;
+         ctx.drawImage(img, 0, 0);
+         ctx.globalAlpha = 1;
+         ctx.beginPath();
+         ctx.strokeStyle = "#ddd";
+         for (let {goal: [h, v]} of this.pieces) {
+           ctx.rect(h, v, img.width / hsize, img.height / vsize);
+         }
+         ctx.stroke();
+         for (let {current: [h, v], goal: [correctH, correctV]} of this.pieces) {
+           ctx.drawImage(img, correctH, correctV, img.width / hsize, img.height / vsize,
+                         h, v, img.width / hsize, img.height / vsize);
+         }
+       },
+       inRect ([posX, posY], [rectX, rectY, rectW, rectH]) {
+         return posX >= rectX && posX <= rectX + rectW && posY >= rectY && posY <= rectY + rectH;
+       }
+     }})();
 
-      window.onload = e => { "use strict";
-        const $ = document.querySelector.bind(document);
-        const puzzleCtx = $('#puzzle-img').getContext('2d');
-        const uploaded = Object.assign(document.createElement('input'), { type: 'file', style: 'display:none', accept: 'image/gif, image/jpeg, image/png'});
+     $(function () {
+       const puzzleCtx = $('#puzzle-img')[0].getContext('2d');
+       const uploaded = Object.assign(document.createElement('input'), { type: 'file', style: 'display:none', accept: 'image/gif, image/jpeg, image/png'});
 
-        puzzle.dimensions = [3, 3];
-        $('#puzzle-game').appendChild(uploaded);
-        $('#load-image').onclick = e => {
-          uploaded.click();
-        };
-        uploaded.onchange = e => {
-          const READER = new FileReader();
-          READER.onload = e => {
-            const imageBuffer = READER.result;
-            puzzle.image.src = URL.createObjectURL(new Blob([imageBuffer], {type: uploaded.files[0].type}));
-          };
-          READER.readAsArrayBuffer(uploaded.files[0]);
-        };
-        puzzle.image.onload = e => {
-          URL.revokeObjectURL(puzzle.image.src);
-          puzzleCtx.canvas.width = puzzle.image.width * 2;
-          puzzleCtx.canvas.height = puzzle.image.height;
-          puzzle.setImage(puzzle.image);
-          puzzle.draw(puzzleCtx);
-        };
-        $('#shuffle').onclick = e => {
-          puzzle.shuffle(puzzle.image.width, puzzle.image.height);
-          puzzle.draw(puzzleCtx);
-        };
-        $('#size-selector').onclick = e => {
-          puzzle.setDimensions(e.target.cellIndex + 1, e.target.parentNode.rowIndex + 1);
-          puzzle.draw(puzzleCtx);
-        };
-        $('#puzzle-img').onmousedown = e => {
-          const [hsize, vsize] = puzzle.dimensions;
-          const oldSelectedPiece = puzzle.selectedPiece;
-          for (let [i, {current: [posH, posV]}] of puzzle.pieces.entries()) {
-            const rect = [posH, posV, puzzle.image.width / hsize, puzzle.image.height / vsize];
-            if (puzzle.inRect([e.offsetX, e.offsetY], rect)) {
-              puzzle.selectedPiece = puzzle.pieces[i];
-              puzzle.pieces[i] = puzzle.pieces[puzzle.pieces.length - 1];
-              puzzle.pieces[puzzle.pieces.length - 1] = puzzle.selectedPiece;
-            }
-          }
-          if (oldSelectedPiece === puzzle.selectedPiece) {
-            puzzle.selectedPiece = null;
-          }
-          puzzle.draw(puzzleCtx);
-        };
-        $('#puzzle-img').onmouseup = e => {
-          puzzle.selectedPiece = null;
-        };
-        $('#puzzle-img').onmousemove = e => {
-          const [hsize, vsize] = puzzle.dimensions;
-          if (puzzle.selectedPiece === null) { return; }
-          puzzle.selectedPiece.current = [e.offsetX - 0.5 * puzzle.image.width / hsize, e.offsetY - 0.5 * puzzle.image.height / vsize];
-          puzzle.draw(puzzleCtx);
-        }
-      }
-      </script>
-  <body id="puzzle-game">
-    <h1>Puzzle</h1>
-    <div class="tool-box">
-      <a id="load-image" class="btn">
-        <i class="fa fa-pull-left fa-fw fa-file-image-o"></i>Charger une image
-      </a>
-      <a id="shuffle" class="btn">
-        <i class="fa fa-pull-left fa-fw fa-cubes"></i>Mélanger
-      </a>
-      <a id="restart" class="btn">
-        <i class="fa fa-pull-left fa-fw fa-undo"></i>Recommencer
-      </a>
-      <label class="popover btn">
-        <input type="checkbox" /><span><i class="fa fa-pull-right fa-caret-down"></i>Taille</span>
-        <div class="popover-panel" >
-          <table id="size-selector">
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-            <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          </table>
-        </div>
-      </label>
-    </div>
-    <canvas id="puzzle-img" class="centered checkboard" width="600" height="480"></canvas>
-  </body>
+       puzzle.dimensions = [3, 3];
+       $('#puzzle-game')[0].appendChild(uploaded);
+       $('#load-image').click(function (e) {
+         uploaded.click();
+       });
+       uploaded.onchange = e => {
+         const READER = new FileReader();
+         READER.onload = e => {
+           const imageBuffer = READER.result;
+           puzzle.image.src = URL.createObjectURL(new Blob([imageBuffer], {type: uploaded.files[0].type}));
+         };
+         READER.readAsArrayBuffer(uploaded.files[0]);
+       };
+       $(puzzle.image).load(function (e) {
+         URL.revokeObjectURL(puzzle.image.src);
+         puzzleCtx.canvas.width = puzzle.image.width * 2;
+         puzzleCtx.canvas.height = puzzle.image.height;
+         puzzle.setImage(puzzle.image);
+         puzzle.draw(puzzleCtx);
+       });
+       $('#shuffle').click(function (e) {
+         puzzle.shuffle(puzzle.image.width, puzzle.image.height);
+         puzzle.draw(puzzleCtx);
+       });
+       $('#size-selector').click(function (e) {
+         puzzle.setDimensions(e.target.cellIndex + 1, e.target.parentNode.rowIndex + 1);
+         puzzle.draw(puzzleCtx);
+       });
+       function handleMove (e) {
+         const [hsize, vsize] = puzzle.dimensions;
+         if (puzzle.selectedPiece === null) { return; }
+         puzzle.selectedPiece.current = [e.offsetX - 0.5 * puzzle.image.width / hsize, e.offsetY - 0.5 * puzzle.image.height / vsize];
+         puzzle.draw(puzzleCtx);
+       }
+       $('#puzzle-img').mousedown(function (e) {
+         const [hsize, vsize] = puzzle.dimensions;
+         const oldSelectedPiece = puzzle.selectedPiece;
+         for (let [i, {current: [posH, posV]}] of puzzle.pieces.entries()) {
+           const rect = [posH, posV, puzzle.image.width / hsize, puzzle.image.height / vsize];
+           if (puzzle.inRect([e.offsetX, e.offsetY], rect)) {
+             puzzle.selectedPiece = puzzle.pieces[i];
+             puzzle.pieces[i] = puzzle.pieces[puzzle.pieces.length - 1];
+             puzzle.pieces[puzzle.pieces.length - 1] = puzzle.selectedPiece;
+           }
+         }
+         if (oldSelectedPiece === puzzle.selectedPiece) {
+           puzzle.selectedPiece = null;
+         }
+         puzzle.draw(puzzleCtx);
+         $('#puzzle-img').on('mousemove', handleMove);
+       });
+       $('#puzzle-img').mouseup(function (e) {
+         puzzle.selectedPiece = null;
+         $('#puzzle-img').off('mousemove', handleMove);
+       });
+     });
+    </script>
+    <body id="puzzle-game">
+      <h1>Puzzle</h1>
+      <div class="tool-box">
+        <a id="load-image" class="btn">
+          <i class="fa fa-pull-left fa-fw fa-file-image-o"></i>Charger une image
+        </a>
+        <a id="shuffle" class="btn">
+          <i class="fa fa-pull-left fa-fw fa-cubes"></i>Mélanger
+        </a>
+        <a id="restart" class="btn">
+          <i class="fa fa-pull-left fa-fw fa-undo"></i>Recommencer
+        </a>
+        <label class="popover btn">
+          <input type="checkbox" /><span><i class="fa fa-pull-right fa-caret-down"></i>Taille</span>
+          <div class="popover-panel" >
+            <table id="size-selector">
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+            </table>
+          </div>
+        </label>
+      </div>
+      <canvas id="puzzle-img" class="centered checkboard" width="600" height="480"></canvas>
+    </body>
 </html>
